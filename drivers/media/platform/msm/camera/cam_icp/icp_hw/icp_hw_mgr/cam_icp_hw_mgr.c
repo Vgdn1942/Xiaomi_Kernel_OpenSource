@@ -3557,7 +3557,7 @@ static int cam_icp_mgr_process_cmd_desc(struct cam_icp_hw_mgr *hw_mgr,
 				CAM_ERR(CAM_ICP, "get cmd buf failed %x",
 					hw_mgr->iommu_hdl);
 				num_cmd_buf = (num_cmd_buf > 0) ?
-					num_cmd_buf-- : 0;
+					(num_cmd_buf - 1) : 0;
 				goto rel_cmd_buf;
 			}
 			*fw_cmd_buf_iova_addr = addr;
@@ -3566,7 +3566,7 @@ static int cam_icp_mgr_process_cmd_desc(struct cam_icp_hw_mgr *hw_mgr,
 				((len - cmd_desc[i].offset) <
 				cmd_desc[i].size)){
 				CAM_ERR(CAM_ICP,
-					"Invalid offset/length, i %d offset 0x%x len 0x%x size 0x%x",
+					"Invalid offset/length, i %d offset 0x%x len 0x%zx size 0x%x",
 					i, cmd_desc[i].offset,
 					len, cmd_desc[i].size);
 				goto rel_cmd_buf;
@@ -3581,7 +3581,7 @@ static int cam_icp_mgr_process_cmd_desc(struct cam_icp_hw_mgr *hw_mgr,
 					hw_mgr->iommu_hdl);
 				*fw_cmd_buf_iova_addr = 0;
 				num_cmd_buf = (num_cmd_buf > 0) ?
-					num_cmd_buf-- : 0;
+					(num_cmd_buf - 1) : 0;
 				goto rel_cmd_buf;
 			}
 			if ((len <= cmd_desc[i].offset) ||

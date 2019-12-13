@@ -3681,7 +3681,7 @@ static int cam_isp_packet_generic_blob_handler(void *user_data,
 			(struct cam_isp_init_frame_drop_config *)blob_data;
 
 		if (blob_size < sizeof(struct cam_isp_init_frame_drop_config)) {
-			CAM_ERR(CAM_ISP, "Invalid blob size %u expected %u",
+			CAM_ERR(CAM_ISP, "Invalid blob size %u expected %lu",
 				blob_size,
 				sizeof(struct cam_isp_init_frame_drop_config));
 			return -EINVAL;

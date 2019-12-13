@@ -233,12 +233,13 @@ static int sps_rm_assign(struct sps_pipe *pipe,
 	if (pipe->bam->props.options & SPS_BAM_SMMU_EN) {
 		desc_iova = pipe->connect.desc.iova;
 		data_iova = pipe->connect.data.iova;
-	}
-	pipe->connect.desc = map->desc;
-	pipe->connect.data = map->data;
-	if (pipe->bam->props.options & SPS_BAM_SMMU_EN) {
+		pipe->connect.desc = map->desc;
+		pipe->connect.data = map->data;
 		pipe->connect.desc.iova = desc_iova;
 		pipe->connect.data.iova = data_iova;
+	} else {
+		pipe->connect.desc = map->desc;
+		pipe->connect.data = map->data;
 	}
 
 	pipe->client_state = SPS_STATE_ALLOCATE;

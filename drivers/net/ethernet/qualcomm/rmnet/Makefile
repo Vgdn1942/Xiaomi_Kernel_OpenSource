@@ -1,6 +1,7 @@
 #
 # Makefile for the RMNET module
 #
+subdir-ccflags-y += -Wno-maybe-uninitialized
 
 rmnet-y		 := rmnet_config.o
 rmnet-y		 += rmnet_vnd.o

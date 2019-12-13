@@ -358,7 +358,8 @@ EXPORT_SYMBOL(spmi_sim_trigger_irq);
 int spmi_sim_set_irq_rt_status(struct spmi_sim *sim, u8 sid, u8 per, u8 irq,
 			u8 rt_status)
 {
-	u8 enable, type, pol_high, pol_low, mask, old_rt_status, new_rt_status;
+	u8 enable, type, pol_high, pol_low, mask, new_rt_status;
+	u8 old_rt_status = 0;
 	u32 addr;
 	int rc;
 
@@ -910,7 +911,7 @@ static int spmi_sim_rt_status_get(void *data, u64 *val)
 {
 	struct spmi_sim *sim = data;
 	u32 sid, per, irq, addr;
-	u8 reg_val;
+	u8 reg_val = 0;
 	int rc;
 
 	irq = HWIRQ_IRQ(sim->debug_hwirq);
@@ -969,7 +970,7 @@ static struct spmi_sim_ops spmi_sim_irq_latched_clr_ops = {
 static int spmi_sim_irq_en_set_pre_write(struct spmi_sim *sim,  u32 addr,
 						u8 *val)
 {
-	u8 reg_val;
+	u8 reg_val = 0;
 	int rc;
 
 	rc = spmi_sim_read(sim, addr, &reg_val);

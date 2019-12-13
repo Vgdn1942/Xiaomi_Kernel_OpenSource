@@ -250,7 +250,7 @@ static const char * const _size_to_string(unsigned long size)
 	case SZ_1M * 32:
 		return "32M";
 	}
-	return "unknown size, please add to %s function", __func__;
+	return "unknown size, please add to function";
 }
 
 static int nr_iters_set(void *data, u64 val)

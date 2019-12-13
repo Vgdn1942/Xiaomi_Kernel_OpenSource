@@ -422,6 +422,7 @@ static u8 sde_hdcp_2x_stream_type(u8 min_enc_level)
 	   hdcp_min_enc_level_2 = 2;
 	u8 const stream_type_0 = 0, stream_type_1 = 1;
 
+#if 0
 	switch (min_enc_level) {
 	case hdcp_min_enc_level_0:
 	case hdcp_min_enc_level_1:
@@ -434,6 +435,16 @@ static u8 sde_hdcp_2x_stream_type(u8 min_enc_level)
 		stream_type = stream_type_0;
 		break;
 	}
+#else
+	if ((min_enc_level == hdcp_min_enc_level_0) ||
+		(min_enc_level == hdcp_min_enc_level_1)) {
+		stream_type = stream_type_0;
+	} else if (min_enc_level == hdcp_min_enc_level_2) {
+		stream_type = stream_type_1;
+	} else {
+		stream_type = stream_type_0;
+	}
+#endif
 
 	pr_debug("min_enc_level = %u, type = %u", min_enc_level, stream_type);
 

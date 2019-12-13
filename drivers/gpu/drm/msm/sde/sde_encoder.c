@@ -1949,12 +1949,15 @@ static int _sde_encoder_update_rsc_client(
 				sde_enc->cur_master->connector);
 
 	if (sde_encoder_in_clone_mode(drm_enc) || !disp_info->is_primary ||
-			  (disp_info->is_primary && qsync_mode))
+			  (disp_info->is_primary && qsync_mode)) {
 		rsc_state = enable ? SDE_RSC_CLK_STATE : SDE_RSC_IDLE_STATE;
-	else if (disp_info->capabilities & MSM_DISPLAY_CAP_CMD_MODE)
+	} else if (disp_info->capabilities & MSM_DISPLAY_CAP_CMD_MODE) {
 		rsc_state = enable ? SDE_RSC_CMD_STATE : SDE_RSC_IDLE_STATE;
-	else if (disp_info->capabilities & MSM_DISPLAY_CAP_VID_MODE)
+	} else if (disp_info->capabilities & MSM_DISPLAY_CAP_VID_MODE) {
 		rsc_state = enable ? SDE_RSC_VID_STATE : SDE_RSC_IDLE_STATE;
+	} else {
+		rsc_state = SDE_RSC_IDLE_STATE;
+	}
 
 	SDE_EVT32(rsc_state, qsync_mode);
 

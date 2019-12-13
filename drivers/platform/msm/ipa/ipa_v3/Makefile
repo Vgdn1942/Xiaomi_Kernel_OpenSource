@@ -1,3 +1,5 @@
+subdir-ccflags-y += -Wno-format
+
 obj-$(CONFIG_IPA3) += ipahal/
 
 obj-$(CONFIG_IPA3) += ipat.o

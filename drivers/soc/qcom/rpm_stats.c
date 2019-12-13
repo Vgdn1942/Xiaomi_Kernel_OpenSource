@@ -200,8 +200,8 @@ static ssize_t msm_rpmstats_populate_stats(void)
 	prvdata.reg_base = ioremap_nocache(gpdata->phys_addr_base,
 					gpdata->phys_size);
 	if (!prvdata.reg_base) {
-		pr_err("ERROR could not ioremap start=%pa, len=%u\n",
-				gpdata->phys_addr_base, gpdata->phys_size);
+		pr_err("ERROR could not ioremap len=%u\n",
+				gpdata->phys_size);
 		return -EBUSY;
 	}
 	prvdata.read_idx = prvdata.len = 0;

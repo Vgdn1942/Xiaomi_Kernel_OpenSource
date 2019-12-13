@@ -984,6 +984,10 @@ static irqreturn_t qbt1000_ipc_irq_handler(int irq, void *dev_id)
 	 */
 	drvdata->ipc_is_stale = false;
 
+	rc = send_tz_cmd(drvdata, drvdata->fp_app_handle, 0,
+			&rxipc, sizeof(rxipc),
+			(void *)&rx_cmd, sizeof(*rx_cmd));
+
 	while (retry_count > 0) {
 		/*
 		 * send the TZ command to fetch the message from firmware

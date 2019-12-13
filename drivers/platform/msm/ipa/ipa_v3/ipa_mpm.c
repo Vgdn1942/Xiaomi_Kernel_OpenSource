@@ -542,7 +542,7 @@ static dma_addr_t ipa_mpm_smmu_map(void *va_addr,
 	}
 
 	if (carved_iova >= cb->va_end) {
-		IPA_MPM_ERR("running out of carved_iova %x\n", carved_iova);
+		IPA_MPM_ERR("running out of carved_iova %lx\n", carved_iova);
 		ipa_assert();
 	}
 	/*
@@ -1411,8 +1411,8 @@ static int ipa_mpm_vote_unvote_pcie_clk(enum ipa_mpm_clk_vote_type vote,
 		result = mhi_device_get_sync(
 			ipa_mpm_ctx->md[probe_id].mhi_dev, MHI_VOTE_BUS);
 		if (result) {
-			IPA_MPM_ERR("mhi_sync_get failed for probe_id %d\n",
-				result, probe_id);
+			IPA_MPM_ERR("mhi_sync_get failed for probe_id = %d\n",
+				probe_id);
 			return result;
 		}
 
@@ -1804,12 +1804,12 @@ static void ipa_mpm_read_channel(enum ipa_client_type chan)
 
 	ep = &ipa3_ctx->ep[ipa_ep_idx];
 
-	IPA_MPM_ERR("Reading channel for chan %d, ep = %d, gsi_chan_hdl = %d\n",
-		chan, ep, ep->gsi_chan_hdl);
+	IPA_MPM_ERR("Reading channel for chan %d, gsi_chan_hdl = %ld\n",
+		chan, ep->gsi_chan_hdl);
 
 	res = ipa3_get_gsi_chan_info(&chan_info, ep->gsi_chan_hdl);
 	if (res)
-		IPA_MPM_ERR("Reading of channel failed for ep %d\n", ep);
+		IPA_MPM_ERR("Reading of channel failed for ep\n");
 }
 
 /* ipa_mpm_mhi_probe_cb is received for each MHI'/MHI channel
@@ -1840,7 +1840,7 @@ static int ipa_mpm_mhi_probe_cb(struct mhi_device *mhi_dev,
 	probe_id = get_idx_from_id(mhi_id);
 
 	if (probe_id >= IPA_MPM_MHIP_CH_ID_MAX) {
-		IPA_MPM_ERR("chan=%s is not supported for now\n", mhi_id);
+		IPA_MPM_ERR("chan is not supported for now\n");
 		return -EPERM;
 	}
 
@@ -2428,42 +2428,43 @@ int ipa_mpm_mhip_xdci_pipe_enable(enum ipa_usb_teth_prot xdci_teth_prot)
 		return 0;
 	}
 
-	if (mhip_client != IPA_MPM_MHIP_USB_DPL)
+	if (mhip_client != IPA_MPM_MHIP_USB_DPL) {
 		/* Start UL MHIP channel for offloading teth connection */
 		status = ipa_mpm_start_stop_mhip_chan(IPA_MPM_MHIP_CHAN_UL,
 							probe_id,
 							MPM_MHIP_START);
-	switch (status) {
-	case MHIP_STATUS_SUCCESS:
-	case MHIP_STATUS_NO_OP:
-		ipa_mpm_change_teth_state(probe_id, IPA_MPM_TETH_CONNECTED);
+		switch (status) {
+		case MHIP_STATUS_SUCCESS:
+		case MHIP_STATUS_NO_OP:
+			ipa_mpm_change_teth_state(probe_id, IPA_MPM_TETH_CONNECTED);
 
-		pipe_idx = ipa3_get_ep_mapping(IPA_CLIENT_USB_PROD);
+			pipe_idx = ipa3_get_ep_mapping(IPA_CLIENT_USB_PROD);
 
-		/* Lift the delay for rmnet USB prod pipe */
-		ipa3_xdci_ep_delay_rm(pipe_idx);
-		if (status == MHIP_STATUS_NO_OP) {
-			/* Channels already have been started,
-			 * we can devote for pcie clocks
-			 */
+			/* Lift the delay for rmnet USB prod pipe */
+			ipa3_xdci_ep_delay_rm(pipe_idx);
+			if (status == MHIP_STATUS_NO_OP) {
+				/* Channels already have been started,
+				 * we can devote for pcie clocks
+				 */
+				ipa_mpm_vote_unvote_pcie_clk(CLK_OFF, probe_id);
+			}
+			break;
+		case MHIP_STATUS_EP_NOT_READY:
 			ipa_mpm_vote_unvote_pcie_clk(CLK_OFF, probe_id);
+			ipa_mpm_change_teth_state(probe_id, IPA_MPM_TETH_INPROGRESS);
+			break;
+		case MHIP_STATUS_FAIL:
+		case MHIP_STATUS_BAD_STATE:
+		case MHIP_STATUS_EP_NOT_FOUND:
+			IPA_MPM_ERR("UL chan cant be started err =%d\n", status);
+			ipa_mpm_vote_unvote_pcie_clk(CLK_OFF, probe_id);
+			ret = -EFAULT;
+			break;
+		default:
+			ipa_mpm_vote_unvote_pcie_clk(CLK_OFF, probe_id);
+			IPA_MPM_ERR("Err not found\n");
+			break;
 		}
-		break;
-	case MHIP_STATUS_EP_NOT_READY:
-		ipa_mpm_vote_unvote_pcie_clk(CLK_OFF, probe_id);
-		ipa_mpm_change_teth_state(probe_id, IPA_MPM_TETH_INPROGRESS);
-		break;
-	case MHIP_STATUS_FAIL:
-	case MHIP_STATUS_BAD_STATE:
-	case MHIP_STATUS_EP_NOT_FOUND:
-		IPA_MPM_ERR("UL chan cant be started err =%d\n", status);
-		ipa_mpm_vote_unvote_pcie_clk(CLK_OFF, probe_id);
-		ret = -EFAULT;
-		break;
-	default:
-		ipa_mpm_vote_unvote_pcie_clk(CLK_OFF, probe_id);
-		IPA_MPM_ERR("Err not found\n");
-		break;
 	}
 	return ret;
 }
@@ -2670,14 +2671,14 @@ static int ipa_mpm_probe(struct platform_device *pdev)
 		IPA_MPM_ERR("failed to read qcom,mhi-chdb-base\n");
 		goto fail_probe;
 	}
-	IPA_MPM_DBG("chdb-base=0x%x\n", ipa_mpm_ctx->dev_info.chdb_base);
+	//IPA_MPM_DBG("chdb-base=0x%x\n", ipa_mpm_ctx->dev_info.chdb_base);
 
 	if (of_property_read_u32(pdev->dev.of_node, "qcom,mhi-erdb-base",
 		&ipa_mpm_ctx->dev_info.erdb_base)) {
 		IPA_MPM_ERR("failed to read qcom,mhi-erdb-base\n");
 		goto fail_probe;
 	}
-	IPA_MPM_DBG("erdb-base=0x%x\n", ipa_mpm_ctx->dev_info.erdb_base);
+	//IPA_MPM_DBG("erdb-base=0x%x\n", ipa_mpm_ctx->dev_info.erdb_base);
 
 	ret = ipa_mpm_populate_smmu_info(pdev);
 

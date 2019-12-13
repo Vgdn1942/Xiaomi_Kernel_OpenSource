@@ -849,7 +849,7 @@ static void dwc3_remove_requests(struct dwc3 *dwc, struct dwc3_ep *dep)
 	if (dep->number == 1 && dwc->ep0state != EP0_SETUP_PHASE) {
 		unsigned int dir;
 
-		dbg_log_string("CTRLPEND", dwc->ep0state);
+		dbg_log_string("CTRLPEND");
 		dir = !!dwc->ep0_expect_in;
 		if (dwc->ep0state == EP0_DATA_PHASE)
 			dwc3_ep0_end_control_data(dwc, dwc->eps[dir]);

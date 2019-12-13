@@ -391,11 +391,11 @@ void qpnp_lpg_ramp_step_ms_set(struct pwm_device *pwm, u16 step_ms)
 {
 	struct qpnp_lpg_channel *channel;
 
-	if (pwm != NULL)
+	if (pwm != NULL) {
 		channel = pwm_dev_to_qpnp_lpg(pwm->chip, pwm);
-
-	if (channel != NULL)
-		channel->ramp_config.step_ms = step_ms;
+		if (channel != NULL)
+			channel->ramp_config.step_ms = step_ms;
+	}
 }
 EXPORT_SYMBOL(qpnp_lpg_ramp_step_ms_set);
 
@@ -403,12 +403,11 @@ int qpnp_lpg_ramp_step_ms_get(struct pwm_device *pwm)
 {
 	struct qpnp_lpg_channel *channel;
 
-	if (pwm != NULL)
+	if (pwm != NULL) {
 		channel = pwm_dev_to_qpnp_lpg(pwm->chip, pwm);
-
-	if (channel != NULL)
-		return channel->ramp_config.step_ms;
-
+		if (channel != NULL)
+			return channel->ramp_config.step_ms;
+	}
 	return 0;
 }
 EXPORT_SYMBOL(qpnp_lpg_ramp_step_ms_get);
@@ -417,11 +416,11 @@ void qpnp_lpg_pause_lo_count_set(struct pwm_device *pwm, u8 pause_lo_count)
 {
 	struct qpnp_lpg_channel *channel;
 
-	if (pwm != NULL)
+	if (pwm != NULL) {
 		channel = pwm_dev_to_qpnp_lpg(pwm->chip, pwm);
-
-	if (channel != NULL)
-		channel->ramp_config.pause_lo_count = pause_lo_count;
+		if (channel != NULL)
+			channel->ramp_config.pause_lo_count = pause_lo_count;
+	}
 }
 EXPORT_SYMBOL(qpnp_lpg_pause_lo_count_set);
 
@@ -429,12 +428,11 @@ u8 qpnp_lpg_pause_lo_count_get(struct pwm_device *pwm)
 {
 	struct qpnp_lpg_channel *channel;
 
-	if (pwm != NULL)
+	if (pwm != NULL) {
 		channel = pwm_dev_to_qpnp_lpg(pwm->chip, pwm);
-
-	if (channel != NULL)
-		return channel->ramp_config.pause_lo_count;
-
+		if (channel != NULL)
+			return channel->ramp_config.pause_lo_count;
+	}
 	return 0;
 }
 EXPORT_SYMBOL(qpnp_lpg_pause_lo_count_get);
@@ -787,36 +785,37 @@ u8 qpnp_lpg_switch_lut_pattern(struct pwm_device *pwm, int index)
 	struct qpnp_lpg_channel *channel;
 	struct qpnp_lpg_lut *lut;
 
-	if (pwm != NULL)
+	if (pwm != NULL) {
 		channel = pwm_dev_to_qpnp_lpg(pwm->chip, pwm);
 
-	if (channel != NULL)
-		lut = channel->chip->lut;
+		if (channel != NULL) {
+			lut = channel->chip->lut;
 
-	if (lut == NULL) {
-		pr_err("lut is NULL\n");
+			if (lut != NULL)
+
+			if (!lut->pattern_switch) {
+				pr_err("lut pattern switch disabled\n");
+				return -1;
+			}
+
+			if (index < 0) {
+				pr_err("invalid index:%d\n", index);
+				return -1;
+			}
+
+			if (index == 0) {
+				channel->ramp_config.lo_idx = 0;
+				qpnp_lpg_set_lut_pattern(channel, lut->pattern, lut->pattern_length);
+				channel->ramp_config.hi_idx = lut->pattern_length - 1;
+			} else {
+				channel->ramp_config.lo_idx = 0;
+				qpnp_lpg_set_lut_pattern(channel, lut->pattern_camera, lut->pattern_camera_length);
+				channel->ramp_config.hi_idx = lut->pattern_camera_length - 1;
+			}
+		} else
 		return -1;
-	}
-
-	if (!lut->pattern_switch) {
-		pr_err("lut pattern switch disabled\n");
+	} else
 		return -1;
-	}
-
-	if (index < 0) {
-		pr_err("invalid index:%d\n", index);
-		return -1;
-	}
-
-	if (index == 0) {
-		channel->ramp_config.lo_idx = 0;
-		qpnp_lpg_set_lut_pattern(channel, lut->pattern, lut->pattern_length);
-		channel->ramp_config.hi_idx = lut->pattern_length - 1;
-	} else {
-		channel->ramp_config.lo_idx = 0;
-		qpnp_lpg_set_lut_pattern(channel, lut->pattern_camera, lut->pattern_camera_length);
-		channel->ramp_config.hi_idx = lut->pattern_camera_length - 1;
-	}
 
 	return 0;
 }
@@ -826,10 +825,12 @@ u8 qpnp_lpg_lo_idx_get(struct pwm_device *pwm)
 {
 	struct qpnp_lpg_channel *channel;
 
-	if (pwm != NULL)
+	if (pwm != NULL) {
 		channel = pwm_dev_to_qpnp_lpg(pwm->chip, pwm);
-
-	return channel->ramp_config.lo_idx;
+		if (channel != NULL)
+			return channel->ramp_config.lo_idx;
+	}
+	return 0;
 }
 EXPORT_SYMBOL(qpnp_lpg_lo_idx_get);
 
@@ -838,24 +839,19 @@ u8 qpnp_lpg_lo_idx_set(struct pwm_device *pwm, int lo_idx)
 	struct qpnp_lpg_channel *channel;
 	struct qpnp_lpg_lut *lut;
 
-	if (pwm != NULL)
+	if (pwm != NULL) {
 		channel = pwm_dev_to_qpnp_lpg(pwm->chip, pwm);
-
-	if (channel != NULL)
-		lut = channel->chip->lut;
-
-	if (lut == NULL) {
-		pr_err("lut is NULL\n");
-		return -1;
+		if (channel != NULL) {
+			lut = channel->chip->lut;
+			if (lut != NULL) {
+				if (lo_idx < 0 || lo_idx > lut->pattern_length) {
+					pr_err("invalid lo_idx:%d\n", lo_idx);
+					return -1;
+				} else
+					channel->ramp_config.lo_idx = lo_idx;
+			}
+		}
 	}
-
-	if (lo_idx < 0 || lo_idx > lut->pattern_length) {
-		pr_err("invalid lo_idx:%d\n", lo_idx);
-		return -1;
-	}
-
-	channel->ramp_config.lo_idx = lo_idx;
-
 	return 0;
 }
 EXPORT_SYMBOL(qpnp_lpg_lo_idx_set);

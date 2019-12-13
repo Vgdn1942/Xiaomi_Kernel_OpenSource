@@ -1021,7 +1021,8 @@ static int clk_trion_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 {
 	struct clk_alpha_pll *pll = to_clk_alpha_pll(hw);
 	unsigned long rrate;
-	u32 regval, l, off = pll->offset;
+	u32 regval, off = pll->offset;
+	u32 l = 0;
 	u64 a;
 	int ret;
 
@@ -1286,7 +1287,8 @@ static int clk_regera_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 {
 	struct clk_alpha_pll *pll = to_clk_alpha_pll(hw);
 	unsigned long rrate;
-	u32 l, regval, off = pll->offset;
+	u32 regval, off = pll->offset;
+	u32 l = 0;
 	u64 a;
 	int ret;
 
@@ -2120,7 +2122,8 @@ static int clk_fabia_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 {
 	struct clk_alpha_pll *pll = to_clk_alpha_pll(hw);
 	unsigned long rrate;
-	u32 regval, l, off = pll->offset;
+	u32 regval, off = pll->offset;
+	u32 l = 0;
 	u64 a;
 	int ret;
 
@@ -2360,7 +2363,8 @@ static int clk_agera_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 	struct clk_alpha_pll *pll = to_clk_alpha_pll(hw);
 	unsigned long rrate;
 	int ret;
-	u32 l, off = pll->offset;
+	u32 off = pll->offset;
+	u32 l = 0;
 	u64 a;
 
 	rrate = alpha_pll_round_rate(pll, rate, prate, &l, &a);
@@ -2668,7 +2672,8 @@ static int alpha_pll_lucid_set_rate(struct clk_hw *hw, unsigned long rate,
 {
 	struct clk_alpha_pll *pll = to_clk_alpha_pll(hw);
 	unsigned long rrate;
-	u32 regval, l;
+	u32 regval;
+	u32 l = 0;
 	u64 a;
 	int ret;
 

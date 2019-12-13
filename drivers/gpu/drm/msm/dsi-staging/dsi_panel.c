@@ -706,7 +706,7 @@ static int dsi_panel_update_pwm_backlight(struct dsi_panel *panel,
 
 	rc = pwm_config(bl->pwm_bl, duty, period_ns);
 	if (rc) {
-		pr_err("[%s] failed to change pwm config, rc=\n", panel->name,
+		pr_err("[%s] failed to change pwm config, rc=%d\n", panel->name,
 			rc);
 		goto error;
 	}
@@ -720,7 +720,7 @@ static int dsi_panel_update_pwm_backlight(struct dsi_panel *panel,
 	if (!bl->pwm_enabled) {
 		rc = pwm_enable(bl->pwm_bl);
 		if (rc) {
-			pr_err("[%s] failed to enable pwm, rc=\n", panel->name,
+			pr_err("[%s] failed to enable pwm, rc=%d\n", panel->name,
 				rc);
 			goto error;
 		}
@@ -2466,7 +2466,7 @@ static int dsi_panel_parse_bl_config(struct dsi_panel *panel)
 
 	panel->bl_config.dcs_type_ss = utils->read_bool(utils->data,
 							"qcom,mdss-dsi-bl-dcs-type-ss");
-	
+
 	data = utils->get_property(utils->data, "qcom,bl-update-flag", NULL);
 	if (!data) {
 		panel->bl_config.bl_update = BL_UPDATE_NONE;

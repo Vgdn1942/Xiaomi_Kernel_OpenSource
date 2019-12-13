@@ -373,7 +373,7 @@ static int nqx_standby_write(struct nqx_dev *nqx_dev,
 static int sn100_ese_pwr(struct nqx_dev *nqx_dev, unsigned long int arg)
 {
 	int r = -1;
-    dev_warn(&nqx_dev->client->dev, "%s : enter, arg=%d \n", __func__, arg);
+    dev_warn(&nqx_dev->client->dev, "%s : enter, arg=%ld \n", __func__, arg);
 	if (arg == 0) {
 		/**
 		 * Let's store the NFC VEN pin state
@@ -592,7 +592,7 @@ int nfc_ioctl_power_states(struct file *filp, unsigned long arg)
 	int r = 0;
 	struct nqx_dev *nqx_dev = filp->private_data;
 
-	dev_warn(&nqx_dev->client->dev, "%s : enter, arg=%d \n", __func__, arg);
+	dev_warn(&nqx_dev->client->dev, "%s : enter, arg=%ld \n", __func__, arg);
 
 	if (arg == 0) {
 		/*
@@ -778,7 +778,7 @@ static long nfc_ioctl(struct file *pfile, unsigned int cmd,
 	int r = 0;
 	struct nqx_dev *nqx_dev = pfile->private_data;
 
-	dev_warn(&nqx_dev->client->dev, "%s : enter, arg=%d \n", __func__, arg);
+	dev_warn(&nqx_dev->client->dev, "%s : enter, arg=%ld \n", __func__, arg);
 	if (!nqx_dev)
 		return -ENODEV;
 

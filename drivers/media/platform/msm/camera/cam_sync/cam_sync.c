@@ -35,12 +35,11 @@ void cam_sync_print_fence_table(void)
 	int cnt;
 
 	for (cnt = 0; cnt < CAM_SYNC_MAX_OBJS; cnt++) {
-		CAM_INFO(CAM_SYNC, "%d, %s, %d, %d, %d",
+		CAM_INFO(CAM_SYNC, "%d, %s, %d, %d",
 			sync_dev->sync_table[cnt].sync_id,
 			sync_dev->sync_table[cnt].name,
 			sync_dev->sync_table[cnt].type,
-			sync_dev->sync_table[cnt].state,
-			sync_dev->sync_table[cnt].ref_cnt);
+			sync_dev->sync_table[cnt].state);
 	}
 }
 
@@ -54,7 +53,7 @@ int cam_sync_create(int32_t *sync_obj, const char *name)
 		idx = find_first_zero_bit(sync_dev->bitmap, CAM_SYNC_MAX_OBJS);
 		if (idx >= CAM_SYNC_MAX_OBJS) {
 			CAM_ERR(CAM_SYNC,
-				"Error: Unable to Create Sync Idx = %d Reached Max!!",
+				"Error: Unable to Create Sync Idx = %ld Reached Max!!",
 				idx);
 			sync_dev->err_cnt++;
 			if (sync_dev->err_cnt == 1)
